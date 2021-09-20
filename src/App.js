@@ -1,23 +1,44 @@
-import logo from './logo.svg';
 import './App.css';
-
+import { useState } from 'react';
+import Form from './components/Form';
+import CardNews from './components/CardNews';
 function App() {
+  const [category, setCategory] = useState("");
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const key = "fff2567b67154fd1beb388f1e45a2a4c"
+
+  const handleApi = async (category) => {
+    setLoading(true);
+    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${key}`;
+    const response = await fetch(url);
+    const result = await response.json();
+    setNews(result.articles)
+    setLoading(false);
+  }
+
+  const handleSearch = () => {
+    handleApi(category);
+    console.log("dando click !");
+  }
+
+  console.log("Array --> ", news);
+
+  console.log("App -->", category);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Form
+        setCategory={setCategory}
+        handleSearch={handleSearch}
+        loading={loading} />
+      {
+        news.map((i, index) => (
+          <CardNews title={i.title} image={i.urlToImage} author={i.author} key={index} content={i.content} />
+        ))
+      }
+
     </div>
   );
 }
